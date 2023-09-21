@@ -12,7 +12,7 @@ import kha.System;
 import kha.input.Keyboard;
 
 class Main {
-	static var currentGamepadID(default, set) = 0;
+	static var currentGamepadIndex(default, set) = 0;
 	static var initializedIndices = new Map<Int, Bool>();
 
 	static var leftStickX = 0.0;
@@ -22,8 +22,8 @@ class Main {
 
 	static var pressedButtons = new Map<Int, Float>();
 
-	static function set_currentGamepadID(value: Int): Int {
-		final prevGamepad = Gamepad.get(currentGamepadID);
+	static function set_currentGamepadIndex(value: Int): Int {
+		final prevGamepad = Gamepad.get(currentGamepadIndex);
 		if (prevGamepad != null) {
 			prevGamepad.remove(axisListener, buttonListener);
 		}
@@ -35,7 +35,7 @@ class Main {
 
 		leftStickX = leftStickY = rightStickX = rightStickY = 0.0;
 		pressedButtons.clear();
-		return currentGamepadID = value;
+		return currentGamepadIndex = value;
 	}
 
 	static function axisListener(axis: Int, value: Float) {
@@ -66,16 +66,16 @@ class Main {
 		g.fontSize = 22;
 		g.color = Color.Cyan;
 
-		g.drawString("Choose Gamepad ID with keyboard (0-9):", 0, 0);
+		g.drawString("Choose gamepad index with keyboard (0-9):", 0, 0);
 		for (i in 0...10) {
-			g.color = i == currentGamepadID ? Color.Red : Color.White;
-			g.drawString(Std.string(i), 330 + i * 30, 0);
+			g.color = i == currentGamepadIndex ? Color.Red : Color.White;
+			g.drawString(Std.string(i), 360 + i * 30, 0);
 		}
 
 		g.color = Color.White;
 		g.drawLine(0, 30, 680, 30, 2);
 
-		final currentGamepad = Gamepad.get(currentGamepadID);
+		final currentGamepad = Gamepad.get(currentGamepadIndex);
 		if (currentGamepad == null) {
 			g.color = Color.Red;
 			g.drawString("Could not fetch gamepad from Kha, get() returned null!", 0, 42);
@@ -120,22 +120,22 @@ class Main {
 
 			Keyboard.get().notify((keycode: kha.input.KeyCode) -> {
 				switch (keycode) {
-					case Zero: currentGamepadID = 0;
-					case One: currentGamepadID = 1;
-					case Two: currentGamepadID = 2;
-					case Three: currentGamepadID = 3;
-					case Four: currentGamepadID = 4;
-					case Five: currentGamepadID = 5;
-					case Six: currentGamepadID = 6;
-					case Seven: currentGamepadID = 7;
-					case Eight: currentGamepadID = 8;
-					case Nine: currentGamepadID = 9;
+					case Zero: currentGamepadIndex = 0;
+					case One: currentGamepadIndex = 1;
+					case Two: currentGamepadIndex = 2;
+					case Three: currentGamepadIndex = 3;
+					case Four: currentGamepadIndex = 4;
+					case Five: currentGamepadIndex = 5;
+					case Six: currentGamepadIndex = 6;
+					case Seven: currentGamepadIndex = 7;
+					case Eight: currentGamepadIndex = 8;
+					case Nine: currentGamepadIndex = 9;
 					default:
 				}
 			});
 
 			// Trigger setter function
-			currentGamepadID = 0;
+			currentGamepadIndex = 0;
 
 			Assets.loadEverything(function () {
 				Scheduler.addTimeTask(update, 0, 1 / 60);
