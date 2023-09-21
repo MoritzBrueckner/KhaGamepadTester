@@ -23,9 +23,33 @@ class Main {
 	static var pressedButtons = new Map<Int, Float>();
 
 	static function set_currentGamepadID(value: Int): Int {
+		final prevGamepad = Gamepad.get(currentGamepadID);
+		if (prevGamepad != null) {
+			prevGamepad.remove(axisListener, buttonListener);
+		}
+
+		final newGamepad = Gamepad.get(value);
+		if (newGamepad != null) {
+			newGamepad.notify(axisListener, buttonListener);
+		}
+
 		leftStickX = leftStickY = rightStickX = rightStickY = 0.0;
 		pressedButtons.clear();
 		return currentGamepadID = value;
+	}
+
+	static function axisListener(axis: Int, value: Float) {
+		switch (axis) {
+			case 0: leftStickX = value;
+			case 1: leftStickY = value;
+			case 2: rightStickX = value;
+			case 3: rightStickY = value;
+			default:
+		}
+	}
+
+	static function buttonListener(button: Int, value: Float) {
+		pressedButtons[button] = value;
 	}
 
 	static function update(): Void {
@@ -57,22 +81,6 @@ class Main {
 			g.drawString("Could not fetch gamepad from Kha, get() returned null!", 0, 42);
 		}
 		else {
-			if (!initializedIndices.exists(currentGamepadID)) {
-				initializedIndices.set(currentGamepadID, true);
-
-				currentGamepad.notify((axis, value) -> {
-					switch (axis) {
-						case 0: leftStickX = value;
-						case 1: leftStickY = value;
-						case 2: rightStickX = value;
-						case 3: rightStickY = value;
-						default:
-					}
-				}, (button, value) -> {
-					pressedButtons[button] = value;
-				});
-			}
-
 			g.drawString("Connected: " + currentGamepad.connected + (currentGamepad.connected ? "" : " (you might need to press a button on the controller to connect)"), 0, 42);
 			g.drawString("ID: " + currentGamepad.id, 0, 62);
 			g.drawString("Vendor: " + currentGamepad.vendor, 0, 82);
@@ -125,6 +133,9 @@ class Main {
 					default:
 				}
 			});
+
+			// Trigger setter function
+			currentGamepadID = 0;
 
 			Assets.loadEverything(function () {
 				Scheduler.addTimeTask(update, 0, 1 / 60);
